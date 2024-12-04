@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: create-tasks-table.sql
+      relativeToChangelogFile: true
