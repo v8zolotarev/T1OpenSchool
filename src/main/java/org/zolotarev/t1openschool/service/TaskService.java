@@ -6,6 +6,7 @@ import org.zolotarev.t1openschool.aspect.annotations.LogAround;
 import org.zolotarev.t1openschool.aspect.annotations.LogBefore;
 import org.zolotarev.t1openschool.dto.TaskDTO;
 import org.zolotarev.t1openschool.entity.Task;
+import org.zolotarev.t1openschool.kafka.KafkaTaskProducer;
 import org.zolotarev.t1openschool.mapper.TaskMapper;
 import org.zolotarev.t1openschool.repository.TaskRepository;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final KafkaTaskProducer kafkaTaskProducer;
 
     @LogBefore
     public TaskDTO createTask(TaskDTO taskDTO) {
@@ -38,10 +40,15 @@ public class TaskService {
 
     public TaskDTO updateTask(Long id, TaskDTO taskDTO) {
         Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task with " + id + "not found"));
+                .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
+
         existingTask.setTitle(taskDTO.getTitle());
         existingTask.setDescription(taskDTO.getDescription());
+        existingTask.setStatus(taskDTO.getStatus());
         Task updatedTask = taskRepository.save(existingTask);
+
+        kafkaTaskProducer.sendTaskStatusUpdate(taskMapper.taskToTaskDTO(updatedTask));
+
         return taskMapper.taskToTaskDTO(updatedTask);
     }
 
