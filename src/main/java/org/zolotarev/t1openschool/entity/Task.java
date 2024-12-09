@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.zolotarev.t1openschool.enums.TaskStatus;
 
 @Entity
 @Table(name = "tasks")
@@ -24,7 +25,11 @@ public class Task {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "userId")
-    private Long userId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private TaskStatus status;
+
+    @Column(name = "user_id")
+    private Long user_id;
 
 }

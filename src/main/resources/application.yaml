@@ -8,6 +8,15 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: MAIL_USERNAME
+    password: MAIL_PASSWORD
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -22,3 +31,22 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yml
     default-schema: public
     contexts: migrated
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: t1openschool
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 1
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      batch-size: 16384
+    topic:
+      task-updates: task-updates
+
+logging:
+  level:
+    org.zolotarev.t1openschool.kafka: DEBUG
+    org.springframework.kafka: DEBUG
